@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administration — EID HOOP FEST</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    /* --- PIN LOCK SCREEN --- */
+    #pinLockScreen {
+      position: fixed; inset: 0; background: #090909; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #pinLockScreen .pin-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-xl); padding: 48px 40px;
+      width: 100%; max-width: 360px; text-align: center;
+    }
+    .pin-dots { display: flex; justify-content: center; gap: 12px; margin: 24px 0; }
+    .pin-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--border); transition: 0.2s; }
+    .pin-dot.filled { background: var(--red); transform: scale(1.2); }
+    .pin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .pin-btn {
+      padding: 18px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      border-radius: var(--radius-md); font-family: var(--font-display);
+      font-size: 1.4rem; color: var(--white); cursor: pointer; transition: 0.15s;
+    }
+    .pin-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--red); }
+    .pin-btn:active { transform: scale(0.95); }
+    .pin-error { color: var(--red); font-size: 0.85rem; margin-top: 8px; min-height: 20px; }
+    body.locked .main-content, body.locked .sidebar { visibility: hidden; }
+    body { background: #0a0a0a; color: var(--white); font-family: var(--font-body); margin: 0; padding: 0; display: flex; height: 100vh; overflow: hidden; }
+    
+    /* Sidebar */
+    .sidebar { width: 280px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px; }
+    .sidebar-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 48px; text-decoration: none; color: white; }
+    .sidebar-logo-text { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 0.05em; }
+    .sidebar-logo-text span { color: var(--red); }
+    
+    .nav-menu { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--gray-400); text-decoration: none; border-radius: var(--radius-md); font-weight: 500; transition: var(--transition); cursor: pointer; }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+    .nav-item.active { background: rgba(227,25,55,0.1); color: var(--red); font-weight: 600; }
+    .nav-item svg { width: 20px; height: 20px; }
+    
+    .back-btn { margin-top: auto; padding: 12px; text-align: center; color: var(--gray-500); text-decoration: none; font-size: 0.85rem; border-top: 1px solid var(--border); padding-top: 24px; }
+    .back-btn:hover { color: var(--white); }
+
+    /* Main Content */
+    .main-content { flex: 1; overflow-y: auto; padding: 40px; background: #0a0a0a; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+    .header-title { font-family: var(--font-display); font-size: 2.5rem; margin: 0; line-height: 1; }
+    
+    /* Views */
+    .view-section { display: none; animation: fadeIn 0.3s ease; }
+    .view-section.active { display: block; }
+    
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 40px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; }
+    .stat-card-title { color: var(--gray-400); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .stat-card-value { font-family: var(--font-display); font-size: 2.5rem; color: var(--white); }
+    .stat-card-sub { color: var(--gray-500); font-size: 0.85rem; margin-top: 8px; }
+
+    /* Tables */
+    .table-container { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 16px 24px; border-bottom: 1px solid var(--border); }
+    th { background: rgba(255,255,255,0.02); font-family: var(--font-display); letter-spacing: 0.05em; color: var(--gray-400); font-size: 0.85rem; }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; }
+    .badge-red { background: rgba(227,25,55,0.1); color: var(--red); }
+    .badge-green { background: rgba(34,197,94,0.1); color: #22c55e; }
+    .badge-gray { background: rgba(255,255,255,0.1); color: var(--gray-300); }
+    
+    .empty-state { padding: 60px 24px; text-align: center; color: var(--gray-500); }    
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--surface); border: 1px solid var(--border); padding: 14px 24px; border-radius: 99px; display: flex; align-items: center; gap: 10px; z-index: 2000; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast-success { border-color: #22c55e; color: #4ade80; }
+    .toast-error { border-color: var(--red); color: var(--red); }
+    .toast-icon { font-size: 1.2rem; }
+
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(8px); }
+    .modal.open { opacity: 1; pointer-events: all; }
+    .modal-content { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 32px; width: 100%; max-width: 420px; transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; }
+    .modal.open .modal-content { transform: scale(1); }
+    .confirm-icon { font-size: 3.5rem; margin-bottom: 16px; display: block; }
+    
+    .player-list { list-style: none; padding: 0; margin: 20px 0; max-height: 300px; overflow-y: auto; }
+    .player-list li { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .player-list li:last-child { border-bottom: none; }
+    .pay-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--white); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+    .pay-btn.paid { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: #22c55e; }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="locked">
+
+<!-- PIN LOCK SCREEN -->
+<div id="pinLockScreen">
+  <div class="pin-box">
+    <div style="font-size:3rem; margin-bottom:12px;">🔐</div>
+    <h2 style="font-family:var(--font-display); font-size:2rem; margin-bottom:4px;">ACCÈS <span style="color:var(--red);">ADMIN</span></h2>
+    <p style="color:var(--gray-500); font-size:0.85rem; margin-bottom:0;">Saisir le code PIN administrateur</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+      <div class="pin-dot" id="d4"></div>
+    </div>
+    <div class="pin-grid">
+      <button class="pin-btn" onclick="pinPress('1')">1</button>
+      <button class="pin-btn" onclick="pinPress('2')">2</button>
+      <button class="pin-btn" onclick="pinPress('3')">3</button>
+      <button class="pin-btn" onclick="pinPress('4')">4</button>
+      <button class="pin-btn" onclick="pinPress('5')">5</button>
+      <button class="pin-btn" onclick="pinPress('6')">6</button>
+      <button class="pin-btn" onclick="pinPress('7')">7</button>
+      <button class="pin-btn" onclick="pinPress('8')">8</button>
+      <button class="pin-btn" onclick="pinPress('9')">9</button>
+      <button class="pin-btn" onclick="pinPress('X')" style="font-size:1rem; color:var(--gray-400);">⌫</button>
+      <button class="pin-btn" onclick="pinPress('0')">0</button>
+      <button class="pin-btn" onclick="pinPress('X')" style="font-size:0.8rem; color:var(--gray-400);">Effacer</button>
+    </div>
+    <div class="pin-error" id="pinError"></div>
+  </div>
+</div>
+
+<script>
+  // PIN admin — change ce code pour sécuriser l'accès
+  const ADMIN_PIN = '2026';
+  let pinEntry = '';
+
+  function pinPress(val) {
+    if (val === 'X') {
+      pinEntry = pinEntry.slice(0, -1);
+    } else if (pinEntry.length < 4) {
+      pinEntry += val;
+    }
+    updateDots();
+    if (pinEntry.length === 4) {
+      setTimeout(() => checkPin(), 150);
+    }
+  }
+
+  function updateDots() {
+    for (let i = 1; i <= 4; i++) {
+      document.getElementById('d' + i).classList.toggle('filled', i <= pinEntry.length);
+    }
+  }
+
+  function checkPin() {
+    if (pinEntry === ADMIN_PIN) {
+      sessionStorage.setItem('adminUnlocked', '1');
+      document.getElementById('pinLockScreen').style.display = 'none';
+      document.body.classList.remove('locked');
+      loadAllData();
+    } else {
+      document.getElementById('pinError').textContent = 'Code incorrect. Réessaie.';
+      pinEntry = '';
+      updateDots();
+      setTimeout(() => { document.getElementById('pinError').textContent = ''; }, 2000);
+    }
+  }
+
+  // Si déjà authentifié dans cette session
+  if (sessionStorage.getItem('adminUnlocked') === '1') {
+    document.getElementById('pinLockScreen').style.display = 'none';
+    document.body.classList.remove('locked');
+  }
+
+  // Support clavier
+  document.addEventListener('keydown', (e) => {
+    if (document.getElementById('pinLockScreen').style.display === 'none') return;
+    if (e.key >= '0' && e.key <= '9') pinPress(e.key);
+    else if (e.key === 'Backspace') pinPress('X');
+  });
+</script>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <a href="/" class="sidebar-logo">
+    <div style="font-size:2rem;line-height:1;">🏀</div>
+    <div class="sidebar-logo-text">EID <span>HOOP</span> FEST</div>
+  </a>
+  
+  <div class="nav-menu">
+    <div class="nav-item active" onclick="switchView('dashboard', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      Tableau de bord
+    </div>
+    <div class="nav-item" onclick="switchView('equipes', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      Équipes (Tournoi)
+    </div>
+    <div class="nav-item" onclick="switchView('concours', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+      Concours & Showtime
+    </div>
+  </div>
+  
+  <a href="/" class="back-btn">← Retour au site public</a>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+
+  <!-- DASHBOARD VIEW -->
+  <div id="view-dashboard" class="view-section active">
+    <div class="header">
+      <h1 class="header-title">VUE <span style="color:var(--red);">GLOBALE</span></h1>
+      <button class="btn btn-outline" onclick="loadAllData()">Actualiser</button>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg> Équipes Inscrites</div>
+        <div class="stat-card-value" id="stat-teams">0</div>
+        <div class="stat-card-sub" id="stat-players">0 joueurs au total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Inscrits Concours</div>
+        <div class="stat-card-value" id="stat-concours">0</div>
+        <div class="stat-card-sub">Dunk, 3 Pts & Autres</div>
+      </div>
+      <div class="stat-card" style="border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.05);">
+        <div class="stat-card-title" style="color:#22c55e;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> Revenus Encaissés</div>
+        <div class="stat-card-value" id="stat-revenue" style="color:#4ade80;">0 FCFA</div>
+        <div class="stat-card-sub" id="stat-revenue-details" style="font-size:0.75rem; color:var(--gray-500); margin-top:8px;">
+          <div id="rev-teams">Équipes : 0 FCFA</div>
+          <div id="rev-concours">Concours : 0 FCFA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EQUIPES VIEW -->
+  <div id="view-equipes" class="view-section">
+    <div class="header">
+      <h1 class="header-title">GESTION DES <span style="color:var(--red);">ÉQUIPES</span></h1>
+    </div>
+    <div class="table-container">
+      <table id="teamsTable">
+        <thead>
+          <tr>
+            <th>ÉQUIPE</th>
+            <th>CAPITAINE</th>
+            <th>JOUEURS</th>
+            <th>PAIEMENT</th>
+            <th>CODE SECRET</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody id="teamsList"></tbody>
+      </table>
+      <div id="teamsEmpty" class="empty-state" style="display:none;">Aucune équipe inscrite pour le moment.</div>
+    </div>
+  </div>
+
+  <!-- CONCOURS VIEW -->
+  <div id="view-concours" class="view-section">
+    <div class="header">
+      <h1 class="header-title">INSCRITS <span style="color:var(--red);">CONCOURS</span></h1>
+    </div>
+    <div class="table-container">
+      <table id="concoursTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>NOM COMPLET</th>
+            <th>TÉLÉPHONE</th>
+            <th>CONCOURS</th>
+            <th>PAIEMENT</th>
+            <th>DATE</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody id="concoursList"></tbody>
+      </table>
+      <div id="concoursEmpty" class="empty-state" style="display:none;">Aucune inscription aux concours pour le moment.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Player Modal -->
+<div class="modal" id="playerModal">
+  <div class="modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+      <h2 style="font-family:var(--font-display); font-size:2rem; margin:0;" id="modalTeamName">Équipe</h2>
+      <button onclick="closeModal()" style="background:transparent; border:none; color:var(--gray-400); cursor:pointer;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+    </div>
+    <div style="font-family:monospace; color:var(--red); letter-spacing:0.1em; margin-bottom:8px;" id="modalTeamCode"></div>
+    <ul class="player-list" id="modalPlayerList"></ul>
+    <button class="btn btn-outline btn-full" onclick="closeModal()">Fermer</button>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal" id="confirmModal">
+  <div class="modal-content">
+    <span id="confirmIcon" class="confirm-icon">❓</span>
+    <h3 id="confirmTitle" style="font-family:var(--font-display); font-size:1.8rem; margin-bottom:12px;">Confirmation</h3>
+    <p id="confirmMsg" style="color:var(--gray-400); margin-bottom:24px; line-height:1.5;"></p>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Annuler</button>
+      <button class="btn btn-primary" id="confirmBtn">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="adminToast" class="toast"></div>
+
+<script>
+  let teamsData = [];
+  let concoursData = [];
+
+  function switchView(viewId, el) {
+    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-' + viewId).classList.add('active');
+    
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  async function loadAllData() {
+    try {
+      const [teamsRes, concoursRes] = await Promise.all([
+        fetch('/api/teams'),
+        fetch('/api/concours')
+      ]);
+      
+      teamsData = await teamsRes.json();
+      concoursData = await concoursRes.json();
+      
+      renderDashboard();
+      renderTeams();
+      renderConcours();
+      
+    } catch (err) {
+      console.error('Erreur de chargement des données:', err);
+    }
+  }
+
+  function renderDashboard() {
+    const totalPlayers = teamsData.reduce((acc, team) => acc + team.playerCount, 0);
+    const revTeams = teamsData.filter(t => t.paid).length * 10000;
+    const revConcours = concoursData.filter(c => c.paid).length * 1000;
+    const totalRevenue = revTeams + revConcours;
+    
+    document.getElementById('stat-teams').innerHTML = `${teamsData.length}`;
+    document.getElementById('stat-players').textContent = `${totalPlayers} joueurs inscrits`;
+    document.getElementById('stat-concours').textContent = concoursData.length;
+    document.getElementById('stat-revenue').textContent = totalRevenue.toLocaleString('fr-FR') + ' FCFA';
+    document.getElementById('rev-teams').textContent = `Équipes (${teamsData.filter(t => t.paid).length}) : ${revTeams.toLocaleString('fr-FR')} FCFA`;
+    document.getElementById('rev-concours').textContent = `Concours (${concoursData.filter(c => c.paid).length}) : ${revConcours.toLocaleString('fr-FR')} FCFA`;
+  }
+
+  function renderTeams() {
+    const tbody = document.getElementById('teamsList');
+    const empty = document.getElementById('teamsEmpty');
+    const table = document.getElementById('teamsTable');
+    
+    if (teamsData.length === 0) {
+      table.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+    
+    table.style.display = 'table';
+    empty.style.display = 'none';
+    
+    tbody.innerHTML = teamsData.map(t => `
+      <tr>
+        <td style="font-weight:700;color:var(--white);">${t.name}</td>
+        <td style="color:var(--gray-300);">${t.captainName}</td>
+        <td><span class="badge ${t.playerCount === 12 ? 'badge-green' : 'badge-gray'}">${t.playerCount} / 12</span></td>
+        <td>
+          <button class="pay-btn ${t.paid ? 'paid' : ''}" onclick="togglePay('${t.code}', '${t.name.replace(/'/g, "\\'")}', ${t.paid})">
+            ${t.paid ? '✓ Payé' : 'Non Payé'}
+          </button>
+        </td>
+        <td><code style="background:rgba(227,25,55,0.1); color:var(--red); padding:4px 8px; border-radius:4px; font-weight:700;">${t.secretCode || '---'}</code></td>
+        <td>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-ghost" style="padding:4px 12px; font-size:0.8rem;" onclick="viewPlayers('${t.code}')">Voir Joueurs</button>
+            <button class="btn btn-ghost" style="padding:4px 12px; font-size:0.8rem; color:var(--red);" onclick="deleteTeam('${t.code}', '${t.name.replace(/'/g, "\\'")}')">Supprimer</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function renderConcours() {
+    const tbody = document.getElementById('concoursList');
+    const empty = document.getElementById('concoursEmpty');
+    const table = document.getElementById('concoursTable');
+    
+    if (concoursData.length === 0) {
+      table.style.display = 'none';
+      empty.style.display = 'block';
+      return;
+    }
+    
+    table.style.display = 'table';
+    empty.style.display = 'none';
+    
+    tbody.innerHTML = concoursData.map(c => `
+      <tr>
+        <td style="color:var(--gray-500);">#${c.id}</td>
+        <td style="font-weight:600;color:var(--white);">${c.name}</td>
+        <td style="font-family:monospace;color:var(--gray-300);">${c.phone}</td>
+        <td><span class="badge badge-red">${c.type}</span></td>
+        <td>
+          <button class="pay-btn ${c.paid ? 'paid' : ''}" onclick="toggleConcoursPay(${c.id}, '${c.name.replace(/'/g, "\\'")}', ${c.paid})">
+            ${c.paid ? '✓ Payé' : 'Non Payé'}
+          </button>
+        </td>
+        <td style="color:var(--gray-500);font-size:0.85rem;">${new Date(c.createdAt).toLocaleDateString('fr-FR')}</td>
+        <td>
+          <button class="btn btn-ghost" style="padding:4px 12px; font-size:0.8rem; color:var(--red);" onclick="deleteConcours(${c.id}, '${c.name.replace(/'/g, "\\'")}')">Supprimer</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function viewPlayers(code) {
+    try {
+      const res = await fetch(`/api/teams/${code}`);
+      const data = await res.json();
+      
+      document.getElementById('modalTeamName').textContent = data.name;
+      document.getElementById('modalTeamCode').textContent = "CODE : " + data.code;
+      
+      const list = document.getElementById('modalPlayerList');
+      if (data.players && data.players.length > 0) {
+        list.innerHTML = data.players.map(p => `
+          <li>
+            <span><strong style="color:white;">${p.name}</strong> <span style="color:var(--gray-500); font-size:0.85rem; margin-left:8px;">${p.role || 'Joueur'}</span></span>
+            <span style="color:var(--gray-400); font-family:monospace;">${p.phone || '-'}</span>
+          </li>
+        `).join('');
+      } else {
+        list.innerHTML = '<li style="color:var(--gray-500);">Aucun joueur pour le moment.</li>';
+      }
+      
+      document.getElementById('playerModal').classList.add('open');
+    } catch(e) {
+      console.error(e);
+      alert("Impossible de charger les joueurs.");
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('playerModal').classList.remove('open');
+  }
+
+  // --- POPUPS & TOASTS ---
+  function showToast(msg, type = 'success') {
+    let t = document.querySelector('.toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.className = 'toast';
+      document.body.appendChild(t);
+    }
+    const icon = type === 'success' ? '✅' : '❌';
+    t.innerHTML = `<span class="toast-icon">${icon}</span> <span>${msg}</span>`;
+    t.className = `toast toast-${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function showConfirm(title, msg, onConfirm, icon = '❓') {
+    const modal = document.getElementById('confirmModal');
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMsg').textContent = msg;
+    document.getElementById('confirmIcon').textContent = icon;
+    modal.classList.add('open');
+
+    const btn = document.getElementById('confirmBtn');
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    newBtn.addEventListener('click', () => {
+      onConfirm();
+      closeConfirm();
+    });
+  }
+
+  function closeConfirm() {
+    document.getElementById('confirmModal').classList.remove('open');
+  }
+
+  async function deleteTeam(code, name) {
+    showConfirm(
+      "Supprimer l'équipe",
+      `Es-tu sûr de vouloir supprimer définitivement l'équipe "${name}" ?`,
+      async () => {
+        try {
+          const res = await fetch(`/api/teams/${code}`, { method: 'DELETE' });
+          if(res.ok) {
+            showToast(`Équipe "${name}" supprimée`);
+            loadAllData();
+          }
+        } catch(e) { showToast("Erreur réseau", 'error'); }
+      },
+      "🗑️"
+    );
+  }
+
+  async function deleteConcours(id, name) {
+    showConfirm(
+      "Supprimer l'inscrit",
+      `Es-tu sûr de vouloir retirer "${name}" du concours ?`,
+      async () => {
+        try {
+          const res = await fetch(`/api/concours/${id}`, { method: 'DELETE' });
+          if(res.ok) {
+            showToast(`${name} retiré du concours`);
+            loadAllData();
+          }
+        } catch(e) { showToast("Erreur réseau", 'error'); }
+      },
+      "🗑️"
+    );
+  }
+
+  async function togglePay(code, name, isPaid) {
+    const action = isPaid ? "annuler le paiement" : "confirmer le paiement";
+    const title = isPaid ? "Annuler Paiement" : "Confirmer Paiement";
+    const icon = isPaid ? "↩️" : "💰";
+    showConfirm(
+      title,
+      `Voulez-vous vraiment ${action} pour l'équipe "${name}" ?`,
+      async () => {
+        try {
+          const res = await fetch(`/api/teams/${code}/pay`, { method: 'PUT' });
+          if(res.ok) {
+            const data = await res.json();
+            showToast(data.paid ? "Paiement validé ! ✅" : "Paiement annulé ↩️");
+            loadAllData(); 
+          }
+        } catch(e) {
+          showToast("Erreur réseau", 'error');
+        }
+      },
+      icon
+    );
+  }
+
+  async function toggleConcoursPay(id, name, isPaid) {
+    const action = isPaid ? "annuler le paiement" : "confirmer le paiement";
+    const title = isPaid ? "Paiement Concours" : "Paiement Concours";
+    const icon = isPaid ? "↩️" : "🎟️";
+    showConfirm(
+      title,
+      `Voulez-vous vraiment ${action} pour "${name}" ?`,
+      async () => {
+        try {
+          const res = await fetch(`/api/concours/${id}/pay`, { method: 'PUT' });
+          if(res.ok) {
+            const data = await res.json();
+            showToast(data.paid ? "Paiement validé ! ✅" : "Paiement annulé ↩️");
+            loadAllData(); 
+          }
+        } catch(e) {
+          showToast("Erreur réseau", 'error');
+        }
+      },
+      icon
+    );
+  }
+
+  // Init — ne charge que si l'admin est déjà authentifié
+  if (sessionStorage.getItem('adminUnlocked') === '1') {
+    loadAllData();
+  }
+</script>
+
+</body>
+</html>

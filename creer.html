@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Créer une équipe — EID HOOP FEST</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    .form-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 100px 24px 60px; }
+    .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 40px; width: 100%; max-width: 480px; }
+    .form-header { text-align: center; margin-bottom: 36px; }
+    .form-stack { display: flex; flex-direction: column; gap: 20px; }
+    .input-icon { position: relative; }
+    .input-icon .form-input { padding-left: 44px; }
+    .input-icon .icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--gray-500); pointer-events: none; }
+    .form-tip { background: rgba(227,25,55,0.06); border: 1px solid rgba(227,25,55,0.15); border-radius: var(--radius-md); padding: 14px 16px; display: flex; gap: 10px; align-items: flex-start; }
+    .form-tip-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .form-tip-text { color: var(--gray-400); font-size: 0.83rem; line-height: 1.5; }
+    .btn-submit { position: relative; }
+    .btn-submit .spinner-wrap { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); display: none; }
+    .btn-submit.loading .spinner-wrap { display: block; }
+    .btn-submit.loading span { opacity: 0.6; }
+    @media(max-width:520px){ .form-card{ padding: 28px 20px; border-radius: var(--radius-lg); } }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <div class="nav-logo-badge">🏀</div>
+    <div class="nav-logo-text">EID <span>HOOP</span> FEST</div>
+  </a>
+  <div class="nav-links">
+    <a href="/reglement.html" class="nav-link">Règlement</a>
+    <a href="/participer.html" class="nav-link" style="display:flex;align-items:center;gap:6px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Retour
+    </a>
+  </div>
+</nav>
+
+<div class="form-page">
+  <div class="form-card fade-up">
+    <div class="form-header">
+      <div class="tag" style="display:inline-flex;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.15em;font-size:0.7rem;background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:var(--gray-400);">Rôle : Capitaine</div>
+      <h1 style="font-family:var(--font-display);font-size:2rem;line-height:1;">CRÉER MON <span style="color:var(--red);">ÉQUIPE</span></h1>
+      <p style="color:var(--gray-500);font-size:0.85rem;margin-top:8px;">Tu deviens capitaine et invites tes joueurs</p>
+    </div>
+
+    <form class="form-stack" id="createForm" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="teamName">Nom de l'équipe</label>
+        <div class="input-icon">
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <input class="form-input" type="text" id="teamName" name="teamName" placeholder="Ex: Les Lions de Sokodé" autocomplete="off" required />
+        </div>
+        <span class="form-error" id="teamNameErr"></span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="captainName">Ton prénom (capitaine)</label>
+        <div class="input-icon">
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input class="form-input" type="text" id="captainName" name="captainName" placeholder="Ton prénom" autocomplete="given-name" required />
+        </div>
+        <span class="form-error" id="captainNameErr"></span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="phone">Numéro de téléphone</label>
+        <div class="input-icon">
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.72 16l.2.92z"/></svg>
+          <input class="form-input" type="tel" id="phone" name="phone" placeholder="+228 90 00 00 00" autocomplete="tel" required />
+        </div>
+        <span class="form-error" id="phoneErr"></span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="secretCode">Code Secret (Gestion)</label>
+        <div class="input-icon">
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <input class="form-input" type="password" id="secretCode" name="secretCode" placeholder="Ex: 1234" maxlength="6" required />
+        </div>
+        <p style="font-size:0.75rem; color:var(--gray-500); margin-top:4px;">Ce code te servira à supprimer des joueurs ou gérer ton équipe.</p>
+        <span class="form-error" id="secretCodeErr"></span>
+      </div>
+
+      <div class="form-tip">
+        <span class="form-tip-icon" style="color:var(--red); font-weight:900;">!</span>
+        <p class="form-tip-text">Après la création, tu reçois un <strong style="color:#fff;">code unique</strong> à partager avec tes joueurs pour qu'ils rejoignent ton équipe.</p>
+      </div>
+
+      <span class="form-error" id="globalErr" style="text-align:center;font-size:0.88rem;"></span>
+
+      <button type="submit" class="btn btn-primary btn-full btn-lg btn-submit" id="submitBtn">
+        <span>Créer mon équipe</span>
+        <div class="spinner-wrap"><div class="spinner"></div></div>
+      </button>
+    </form>
+  </div>
+</div>
+
+<script type="module">
+import { createTeam } from '/src/api.js';
+
+const form = document.getElementById('createForm');
+const submitBtn = document.getElementById('submitBtn');
+
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.classList.add('show');
+}
+function clearErrors() {
+  document.querySelectorAll('.form-error').forEach(e => { e.textContent = ''; e.classList.remove('show'); });
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearErrors();
+  const teamName = document.getElementById('teamName').value.trim();
+  const captainName = document.getElementById('captainName').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const secretCode = document.getElementById('secretCode').value.trim();
+
+  let valid = true;
+  if (!teamName) { showError('teamNameErr', 'Le nom de l\'équipe est requis'); valid = false; }
+  if (!captainName) { showError('captainNameErr', 'Ton prénom est requis'); valid = false; }
+  if (!phone) { showError('phoneErr', 'Le numéro de téléphone est requis'); valid = false; }
+  if (!secretCode) { showError('secretCodeErr', 'Définit un code secret'); valid = false; }
+  else if (secretCode.length < 4) { showError('secretCodeErr', 'Minimum 4 caractères'); valid = false; }
+  
+  if (!valid) return;
+
+  submitBtn.classList.add('loading');
+  submitBtn.disabled = true;
+  try {
+    const res = await createTeam({ teamName, captainName, phone, secretCode });
+      
+    // Save to local storage for easy recovery
+    localStorage.setItem('myTeam', JSON.stringify({
+      name: res.name,
+      code: res.code
+    }));
+
+    window.location.href = `/equipe.html?code=${res.code}&new=1`;
+  } catch (err) {
+    showError('globalErr', err.message);
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+  }
+});
+
+// Animate in
+document.querySelector('.form-card').style.opacity = '0';
+document.querySelector('.form-card').style.transform = 'translateY(30px)';
+setTimeout(() => {
+  document.querySelector('.form-card').style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  document.querySelector('.form-card').style.opacity = '1';
+  document.querySelector('.form-card').style.transform = 'none';
+}, 100);
+</script>
+</body>
+</html>

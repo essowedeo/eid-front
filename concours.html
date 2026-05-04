@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscription Concours — EID HOOP FEST</title>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    .form-page {
+      min-height: 100vh;
+      padding: 100px 24px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    select.form-input {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239CA3AF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px top 50%;
+      background-size: 12px auto;
+    }
+
+    .success-msg {
+      display: none;
+      text-align: center;
+      padding: 32px;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: var(--radius-lg);
+      margin-top: 24px;
+    }
+
+    .success-msg.show {
+      display: block;
+    }
+
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: 0.3s; backdrop-filter: blur(8px); }
+    .modal.open { opacity: 1; pointer-events: all; }
+    .modal-content { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 40px; width: 100%; max-width: 450px; transform: scale(0.95); transition: 0.3s; text-align: center; }
+    .modal.open .modal-content { transform: scale(1); }
+  </style>
+</head>
+
+<body>
+
+  <nav class="nav">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-badge">🏀</div>
+      <div class="nav-logo-text">EID <span>HOOP</span> FEST</div>
+    </a>
+    <div class="nav-links">
+      <a href="/reglement.html" class="nav-link">Règlement</a>
+      <a href="/" class="btn btn-ghost" style="font-size:0.85rem;">Retour</a>
+    </div>
+  </nav>
+
+  <div class="form-page">
+    <div class="form-card fade-up">
+      <div class="tag"
+        style="display:inline-flex;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.15em;font-size:0.7rem;background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:var(--gray-400);">
+        Showtime</div>
+      <h1 style="font-family:var(--font-display);font-size:2.5rem;line-height:0.9;margin-bottom:12px;">S'INSCRIRE AUX
+        <span style="color:var(--red);">CONCOURS</span></h1>
+      <p style="color:var(--gray-500);margin-bottom:24px;">Remplis ce formulaire pour réserver ta place. Frais
+        d'inscription : 1000 FCFA à régler le jour J.</p>
+
+      <form id="concoursForm" class="form-stack" novalidate style="display:flex;flex-direction:column;gap:20px;">
+        <div class="form-group">
+          <label class="form-label" for="cName">Ton nom complet</label>
+          <input class="form-input" type="text" id="cName" placeholder="Ex: Jean Dupont" required />
+          <span class="form-error" id="nameErr"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cPhone">Téléphone</label>
+          <input class="form-input" type="tel" id="cPhone" placeholder="+228 90 00 00 00" required />
+          <span class="form-error" id="phoneErr"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cType">Choix du concours</label>
+          <select class="form-input" id="cType">
+            <option value="Dunk">Concours de Dunk</option>
+            <option value="3 Points">Tirs à 3 Points</option>
+          </select>
+        </div>
+
+        <span class="form-error" id="globalErr" style="text-align:center;"></span>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg" id="submitBtn" style="margin-top:8px;">
+          <span>Valider mon inscription</span>
+        </button>
+      </form>
+
+      <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center;">
+        <p style="color: var(--gray-500); font-size: 0.85rem; margin-bottom: 12px;">Déjà inscrit ? Envoie ta preuve de paiement</p>
+        <button class="btn btn-outline btn-sm" onclick="openSearchModal()" style="font-size: 0.8rem;">Vérifier mon statut / Payer</button>
+      </div>
+
+  <!-- Success Modal -->
+<div class="modal" id="successModal">
+  <div class="modal-content fade-up">
+    <div style="font-size:4rem;margin-bottom:16px;">🎉</div>
+    <h2 style="font-family:var(--font-display);font-size:2.5rem;line-height:1;margin-bottom:12px;">INSCRIPTION VALIDÉE</h2>
+    <p style="color:var(--gray-400);font-size:0.95rem;line-height:1.6;margin-bottom:24px;">Ton inscription est enregistrée ! Pour la valider officiellement, merci de régler les frais de participation.</p>
+    
+    <div id="paymentBox" style="background:rgba(227,25,55,0.05); border:1px solid rgba(227,25,55,0.2); border-radius:var(--radius-lg); padding:20px; margin-bottom:24px; text-align:left;">
+      <div style="font-size:0.75rem; text-transform:uppercase; color:var(--red); font-weight:700; margin-bottom:8px;">Instructions de Paiement</div>
+      <div style="font-size:1.1rem; font-weight:700; color:var(--white); margin-bottom:4px;">1 000 FCFA</div>
+      <div style="font-size:0.85rem; color:var(--gray-400);">TMoney / Moov : <strong style="color:var(--white);">93 66 76 00</strong></div>
+      <div style="font-size:0.75rem; color:var(--gray-500); margin-top:4px;">Nom : Organisation EID HOOP FEST</div>
+      
+      <a id="whatsappPayLink" href="#" target="_blank" class="btn btn-primary btn-sm" style="width:100%; margin-top:16px; gap:8px; font-size:0.8rem; background:#25D366; border:none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Preuve sur WhatsApp
+      </a>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+       <button class="btn btn-ghost" onclick="location.reload()">Fermer</button>
+       <a href="/" class="btn btn-primary">Retour</a>
+    </div>
+  </div>
+</div>
+
+<!-- Search Modal -->
+<div class="modal" id="searchModal">
+  <div class="modal-content fade-up" style="max-width: 400px;">
+    <h2 style="font-family:var(--font-display); font-size:1.8rem; margin-bottom:12px;">RETROUVER MON INSCRIPTION</h2>
+    <p style="color:var(--gray-500); font-size:0.85rem; margin-bottom:20px;">Entre ton numéro de téléphone pour vérifier ton statut.</p>
+    <div class="form-group" style="text-align:left;">
+      <input type="tel" id="searchPhone" class="form-input" placeholder="Ton numéro (ex: 90000000)" style="text-align:center;" />
+    </div>
+    <div id="searchResult" style="margin-top:20px; text-align:left; display:none;"></div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top:24px;">
+       <button class="btn btn-ghost" onclick="closeSearchModal()">Annuler</button>
+       <button class="btn btn-primary" onclick="doSearch()">Rechercher</button>
+    </div>
+  </div>
+</div>
+
+    </div>
+
+    <!-- CHALLENGERS LIST -->
+    <div class="fade-up" style="margin-top: 40px; width: 100%; max-width: 480px; text-align: left;">
+      <h3
+        style="font-family: var(--font-display); font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        LES CHALLENGERS INSCRITS <span id="challengersCount" style="color:var(--gray-500); font-size:1rem;">(0)</span>
+      </h3>
+      <div id="listsContainer" style="display: flex; flex-direction: column; gap: 24px;">
+        <!-- DUNK SECTION -->
+        <div id="dunkSection">
+          <h4 style="text-transform: uppercase; font-size: 0.75rem; color: var(--gray-500); letter-spacing: 0.1em; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:8px; height:8px; background:var(--red); border-radius:50%;"></span>
+              Concours de Dunk
+            </div>
+            <span id="dunkCount" style="color:var(--gray-600);">0</span>
+          </h4>
+          <ul id="dunkList" style="list-style: none; padding: 0; margin: 0;"></ul>
+        </div>
+
+        <!-- 3PTS SECTION -->
+        <div id="threePtsSection">
+          <h4 style="text-transform: uppercase; font-size: 0.75rem; color: var(--gray-500); letter-spacing: 0.1em; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:8px; height:8px; background:var(--white); border-radius:50%; opacity:0.5;"></span>
+              Tirs à 3 Points
+            </div>
+            <span id="threePtsCount" style="color:var(--gray-600);">0</span>
+          </h4>
+          <ul id="threePtsList" style="list-style: none; padding: 0; margin: 0;"></ul>
+        </div>
+      </div>
+      <style>
+        .challenger-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 16px;
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          margin-bottom: 8px;
+        }
+
+        .challenger-name {
+          font-weight: 600;
+          color: var(--white);
+        }
+
+        .challenger-badge {
+          background: rgba(227, 25, 55, 0.1);
+          color: var(--red);
+          padding: 4px 10px;
+          border-radius: 99px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+      </style>
+    </div>
+  </div>
+
+  <script>
+    async function loadChallengers() {
+      try {
+        const res = await fetch('/api/concours/public');
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        const dunkList = document.getElementById('dunkList');
+        const threeList = document.getElementById('threePtsList');
+        document.getElementById('challengersCount').textContent = '(' + data.length + ')';
+
+        const dunks = data.filter(c => c.type === 'Dunk');
+        const threePts = data.filter(c => c.type === '3 Points');
+
+        document.getElementById('dunkCount').textContent = dunks.length;
+        document.getElementById('threePtsCount').textContent = threePts.length;
+
+        const renderItem = (c) => `<li class="challenger-item" style="padding: 10px 16px;"><span class="challenger-name">🏀 ${c.name}</span> <span style="font-size:0.7rem; color:var(--gray-500);">#${c.id}</span></li>`;
+
+        dunkList.innerHTML = dunks.length > 0 
+          ? dunks.reverse().map(renderItem).join('') 
+          : '<li style="text-align:center; padding: 20px; color: var(--gray-600); font-size:0.8rem; border:1px dashed var(--border); border-radius:8px;">Aucun inscrit pour le moment</li>';
+
+        threeList.innerHTML = threePts.length > 0 
+          ? threePts.reverse().map(renderItem).join('') 
+          : '<li style="text-align:center; padding: 20px; color: var(--gray-600); font-size:0.8rem; border:1px dashed var(--border); border-radius:8px;">Aucun inscrit pour le moment</li>';
+
+      } catch (e) { console.error('Erreur chargement challengers'); }
+    }
+    document.addEventListener('DOMContentLoaded', loadChallengers);
+    // Auto-select type from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const typeParam = urlParams.get('type');
+    if (typeParam) {
+      const select = document.getElementById('cType');
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].value === typeParam) {
+          select.selectedIndex = i;
+          break;
+        }
+      }
+    }
+
+    document.getElementById('concoursForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('cName').value.trim();
+      const phone = document.getElementById('cPhone').value.trim();
+      const type = document.getElementById('cType').value;
+
+      const nameErr = document.getElementById('nameErr');
+      const phoneErr = document.getElementById('phoneErr');
+      const globalErr = document.getElementById('globalErr');
+
+      nameErr.classList.remove('show');
+      phoneErr.classList.remove('show');
+      globalErr.classList.remove('show');
+
+      let valid = true;
+      if (!name) { nameErr.textContent = 'Requis'; nameErr.classList.add('show'); valid = false; }
+      if (!phone) { phoneErr.textContent = 'Requis'; phoneErr.classList.add('show'); valid = false; }
+
+      if (!valid) return;
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.querySelector('span').textContent = 'Inscription...';
+
+      try {
+        const res = await fetch('/api/concours', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone, type })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Erreur inconnue');
+
+        document.getElementById('successModal').classList.add('open');
+
+        // Préparer le lien WhatsApp
+        const waMsg = encodeURIComponent(`Bonjour EID HOOP FEST, je viens de m'inscrire au concours ${type}. Voici la preuve de paiement pour ${name}.`);
+        document.getElementById('whatsappPayLink').href = `https://wa.me/22893667600?text=${waMsg}`;
+
+        // Actualiser la liste des challengers immédiatement
+        loadChallengers();
+
+      } catch (err) {
+        globalErr.textContent = err.message;
+        globalErr.classList.add('show');
+        btn.disabled = false;
+        btn.querySelector('span').textContent = 'Valider mon inscription';
+      }
+    });
+
+    // --- SEARCH LOGIC ---
+    window.openSearchModal = () => {
+      document.getElementById('searchModal').classList.add('open');
+      document.getElementById('searchPhone').value = '';
+      document.getElementById('searchResult').style.display = 'none';
+    };
+    window.closeSearchModal = () => document.getElementById('searchModal').classList.remove('open');
+
+    window.doSearch = async () => {
+      const phone = document.getElementById('searchPhone').value.trim();
+      const resEl = document.getElementById('searchResult');
+      if (!phone) return;
+
+      try {
+        const res = await fetch(`/api/concours/search`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        });
+        
+        resEl.style.display = 'block';
+        if (res.ok) {
+          const found = await res.json();
+          const waMsg = encodeURIComponent(`Bonjour EID HOOP FEST, je souhaite valider mon inscription (${found.type}) pour ${found.name}.`);
+          resEl.innerHTML = `
+            <div style="padding:16px; background:rgba(255,255,255,0.05); border-radius:8px; border:1px solid var(--border);">
+              <div style="font-weight:700; color:var(--white);">${found.name}</div>
+              <div style="font-size:0.8rem; color:var(--gray-500); margin-bottom:12px;">${found.type}</div>
+              <div style="font-size:0.85rem; color:${found.paid ? '#4ade80' : 'var(--red)'}; font-weight:700; margin-bottom:16px;">
+                Statut : ${found.paid ? 'PAYÉ ✓' : 'NON PAYÉ'}
+              </div>
+              ${!found.paid ? `
+                <a href="https://wa.me/22893667600?text=${waMsg}" target="_blank" class="btn btn-primary btn-sm" style="width:100%; background:#25D366; border:none; font-size:0.75rem;">
+                  Envoyer ma preuve (WhatsApp)
+                </a>
+              ` : ''}
+            </div>
+          `;
+        } else {
+          resEl.innerHTML = `<div style="color:var(--red); font-size:0.85rem; text-align:center;">Aucune inscription trouvée pour ce numéro.</div>`;
+        }
+      } catch (e) {
+        resEl.innerHTML = `<div style="color:var(--red); font-size:0.85rem;">Erreur de recherche.</div>`;
+      }
+    };
+  </script>
+
+</body>
+
+</html>

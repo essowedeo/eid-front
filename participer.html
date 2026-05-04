@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Participer — EID HOOP FEST</title>
+  <meta name="description" content="Crée ton équipe ou rejoins une équipe existante pour le tournoi EID Hoop Fest." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    .participer-hero {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 100px 24px 60px; position: relative;
+    }
+    .participer-bg { position: absolute; inset: 0; overflow: hidden; }
+    .participer-bg img { width: 100%; height: 100%; object-fit: cover; opacity: 0.18; }
+    .participer-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 0%, var(--black) 75%); }
+    .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 720px; margin-top: 40px; }
+    .choice-card {
+      position: relative; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-xl); padding: 40px 32px; text-align: center;
+      cursor: pointer; transition: all 0.3s ease; overflow: hidden; text-decoration: none; color: inherit;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+    .choice-card::before {
+      content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.3s ease;
+      background: linear-gradient(135deg, rgba(227,25,55,0.08) 0%, transparent 70%);
+    }
+    .choice-card:hover::before { opacity: 1; }
+    .choice-card:hover { border-color: var(--red); transform: translateY(-6px); box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(227,25,55,0.2); }
+    @media (max-width: 560px) {
+      .choices { grid-template-columns: 1fr; }
+      .choice-card { padding: 28px 20px; }
+    }
+    .choice-card.featured { border-color: rgba(227,25,55,0.3); background: linear-gradient(135deg, rgba(227,25,55,0.05) 0%, var(--surface) 60%); }
+    .choice-icon { font-size: 3.5rem; line-height: 1; }
+    .choice-title { font-family: var(--font-display); font-size: 1.8rem; letter-spacing: 0.05em; }
+    .choice-desc { color: var(--gray-400); font-size: 0.88rem; line-height: 1.6; }
+    .choice-cta { margin-top: 8px; display: inline-flex; align-items: center; gap: 6px; padding: 10px 22px; background: var(--red); color: #fff; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 600; transition: var(--transition); }
+    .choice-card:hover .choice-cta { background: var(--red-hover); }
+    .choice-badge { position: absolute; top: 16px; right: 16px; padding: 4px 10px; background: var(--red); color: #fff; border-radius: 99px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; }
+    .or-divider { display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 1.4rem; color: var(--gray-500); letter-spacing: 0.1em; }
+    @media(max-width: 560px) {
+      .choices { grid-template-columns: 1fr; }
+      .choice-card { padding: 32px 24px; }
+      .or-divider { display: none; }
+    }
+    .step-indicator { display: flex; align-items: center; gap: 8px; margin-bottom: 32px; }
+    .step { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; }
+    .step.active { background: var(--red); color: #fff; }
+    .step.done { background: var(--surface-3); color: var(--gray-400); }
+    .step-line { flex: 1; height: 1px; background: var(--border); max-width: 40px; }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <div class="nav-logo-badge">🏀</div>
+    <div class="nav-logo-text">EID <span>HOOP</span> FEST</div>
+  </a>
+  <div class="nav-links">
+    <a href="/reglement.html" class="nav-link">Règlement</a>
+    <a href="/" class="nav-link" style="display:flex;align-items:center;gap:6px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Accueil
+    </a>
+  </div>
+</nav>
+
+<section class="participer-hero">
+  <div class="participer-bg">
+    <img src="/photos/photo4.jpeg" alt="" />
+  </div>
+  <div style="position:relative;z-index:1;text-align:center;width:100%;">
+    <div class="step-indicator" style="justify-content:center;">
+      <div class="step active">1</div>
+      <div class="step-line"></div>
+      <div class="step done">2</div>
+      <div class="step-line"></div>
+      <div class="step done">3</div>
+    </div>
+    <div class="tag" style="display:inline-flex;text-transform:uppercase;letter-spacing:0.15em;font-size:0.7rem;background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:var(--gray-400);">Inscription</div>
+    <h1 style="font-family:var(--font-display);font-size:clamp(2.2rem,6vw,4rem);line-height:1;margin:12px 0 8px;">COMMENT TU <span style="color:var(--red);">JOUES ?</span></h1>
+    <p style="color:var(--gray-400);font-size:0.95rem;margin-bottom:8px;">Choisis ton rôle pour le tournoi</p>
+    <div class="choices">
+      <a href="/creer.html" class="choice-card featured" id="cardCreate">
+        <div class="choice-badge">CAPITAINE</div>
+        <div class="choice-icon" style="color:var(--red);">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div class="choice-title">CRÉER UNE ÉQUIPE</div>
+        <div class="choice-desc">Tu deviens capitaine. Tu crées ton équipe et tu invites tes joueurs avec un code unique. <br/><strong style="color:var(--white);display:block;margin-top:8px;">Frais de participation : 10 000 FCFA / équipe</strong></div>
+        <div class="choice-cta">
+          Créer mon équipe
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+      <div class="or-divider">OU</div>
+      <a href="/rejoindre.html" class="choice-card" id="cardJoin">
+        <div class="choice-icon" style="color:var(--gray-600);">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="choice-title">REJOINDRE UNE ÉQUIPE</div>
+        <div class="choice-desc">Tu as un code d'invitation ou tu veux rejoindre tes coéquipiers.</div>
+        <div class="choice-cta" style="background:var(--surface-3);color:var(--gray-300);">
+          Rejoindre
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+    </div>
+    <p style="color:var(--gray-500);font-size:0.8rem;margin-top:24px;">Nombre d'équipes illimité · Inscription gratuite</p>
+  </div>
+</section>
+
+<script type="module">
+  // Animate cards on load
+  document.querySelectorAll('.choice-card').forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    setTimeout(() => {
+      card.style.transition = 'opacity 0.5s ease, transform 0.5s ease, border-color 0.3s ease, box-shadow 0.3s ease';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 200 + i * 150);
+  });
+</script>
+</body>
+</html>

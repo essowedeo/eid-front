@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rejoindre une équipe — EID HOOP FEST</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    .join-page { min-height: 100vh; padding: 120px 24px 60px; display: flex; align-items: center; justify-content: center; }
+    .join-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 40px; width: 100%; max-width: 480px; text-align: center; }
+    
+    .join-form-modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(8px);
+    }
+    .join-form-modal.open { opacity: 1; pointer-events: all; }
+    .join-sheet {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl);
+      padding: 32px; width: 100%; max-width: 440px;
+      transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .join-form-modal.open .join-sheet { transform: scale(1); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <div class="nav-logo-badge">🏀</div>
+    <div class="nav-logo-text">EID <span>HOOP</span> FEST</div>
+  </a>
+  <div class="nav-links">
+    <a href="/reglement.html" class="nav-link">Règlement</a>
+    <a href="/participer.html" class="btn btn-ghost" style="font-size:0.85rem;">Retour</a>
+  </div>
+</nav>
+
+<div class="join-page">
+  <div class="join-card">
+    <div class="tag" style="display:inline-flex;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.15em;font-size:0.7rem;background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:var(--gray-400);">Accès Joueur</div>
+    <h1 style="font-family:var(--font-display);font-size:2.5rem;line-height:0.9;margin-bottom:12px;">REJOINDRE UNE <span style="color:var(--red);">ÉQUIPE</span></h1>
+    <p style="color:var(--gray-500);margin-bottom:32px;">Saisis le code d'invitation à 6 chiffres pour rejoindre tes coéquipiers.</p>
+
+    <form id="codeForm" class="form-stack" novalidate style="display:flex;flex-direction:column;gap:24px;">
+      <div class="form-group">
+        <input class="form-input" type="text" id="inviteCode" placeholder="ABCDEF" maxlength="6"
+          style="text-align:center;font-family:var(--font-display);font-size:2.8rem;letter-spacing:0.25em;text-transform:uppercase;height:80px;" />
+        <span class="form-error" id="codeErr"></span>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full btn-xl" id="codeSubmitBtn">
+        <span>Vérifier le code</span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- JOIN MODAL SHEET -->
+<div class="join-form-modal" id="joinModal">
+  <div class="join-sheet">
+    <div id="sheetTeamInfo" style="margin-bottom:24px;text-align:center;">
+      <div style="font-family:var(--font-display); font-size:2rem; margin-bottom:4px;" id="sheetTeamName"></div>
+      <div style="color:var(--gray-400); font-size:0.85rem;" id="sheetTeamCap"></div>
+    </div>
+    <form id="joinForm" class="form-stack" novalidate style="display:flex;flex-direction:column;gap:16px;">
+      <div class="form-group">
+        <label class="form-label" for="playerName">Ton prénom</label>
+        <input class="form-input" type="text" id="playerName" placeholder="Ton prénom" required />
+        <span class="form-error" id="playerNameErr"></span>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="playerPhone">Téléphone (optionnel)</label>
+        <input class="form-input" type="tel" id="playerPhone" placeholder="+228 90 00 00 00" />
+      </div>
+      <span class="form-error" id="joinGlobalErr" style="text-align:center;"></span>
+      <button type="submit" class="btn btn-primary btn-full btn-lg" id="joinSubmitBtn">
+        <span>Rejoindre l'équipe</span>
+      </button>
+      <button type="button" class="btn btn-ghost btn-full" id="cancelJoin">Annuler</button>
+    </form>
+  </div>
+</div>
+
+<script type="module">
+import { getTeam, joinTeam } from '/src/api.js';
+
+let selectedCode = null;
+
+// CODE FORM
+document.getElementById('codeForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const code = document.getElementById('inviteCode').value.trim().toUpperCase();
+  const errEl = document.getElementById('codeErr');
+  errEl.classList.remove('show');
+  if (!code || code.length !== 6) { errEl.textContent = 'Code invalide (6 caractères)'; errEl.classList.add('show'); return; }
+  
+  const btn = document.getElementById('codeSubmitBtn');
+  btn.disabled = true; btn.querySelector('span').textContent = 'Vérification…';
+  
+  try {
+    const team = await getTeam(code);
+    openJoinSheet(team);
+  } catch (err) {
+    errEl.textContent = err.message; errEl.classList.add('show');
+  } finally { 
+    btn.disabled = false; btn.querySelector('span').textContent = 'Vérifier le code'; 
+  }
+});
+
+// Auto format
+document.getElementById('inviteCode').addEventListener('input', (e) => {
+  e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+});
+
+// SHEET
+function openJoinSheet(team) {
+  selectedCode = team.code;
+  document.getElementById('sheetTeamName').textContent = team.name;
+  document.getElementById('sheetTeamCap').textContent = `Capitaine: ${team.captainName} · ${team.players.length}/12 joueurs`;
+  document.getElementById('joinModal').classList.add('open');
+  document.getElementById('playerName').focus();
+}
+
+document.getElementById('cancelJoin').addEventListener('click', () => {
+  document.getElementById('joinModal').classList.remove('open');
+  selectedCode = null;
+});
+
+document.getElementById('joinForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const playerName = document.getElementById('playerName').value.trim();
+  const phone = document.getElementById('playerPhone').value.trim();
+  const errEl = document.getElementById('playerNameErr');
+  const globalErr = document.getElementById('joinGlobalErr');
+  
+  errEl.classList.remove('show'); globalErr.classList.remove('show');
+  if (!playerName) { errEl.textContent = 'Ton prénom est requis'; errEl.classList.add('show'); return; }
+  
+  const btn = document.getElementById('joinSubmitBtn');
+  btn.disabled = true; btn.querySelector('span').textContent = 'En cours…';
+  
+  try {
+    const res = await joinTeam(selectedCode, { playerName, phone });
+    window.location.href = `/equipe.html?code=${res.team.code}&joined=1`;
+  } catch (err) {
+    globalErr.textContent = err.message; globalErr.classList.add('show');
+    btn.disabled = false; btn.querySelector('span').textContent = 'Rejoindre l\'équipe';
+  }
+});
+
+// Check URL
+const urlCode = new URLSearchParams(location.search).get('code');
+if (urlCode) {
+  document.getElementById('inviteCode').value = urlCode.toUpperCase();
+  getTeam(urlCode).then(openJoinSheet).catch(() => {});
+}
+</script>
+</body>
+</html>

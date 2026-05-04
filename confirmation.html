@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirmation — EID HOOP FEST</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    .confirm-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 100px 24px 60px; }
+    .confirm-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 48px 40px; width: 100%; max-width: 480px; text-align: center; }
+    .info-block { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin: 24px 0; text-align: left; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+    .info-row:last-child { border-bottom: none; }
+    .info-key { color: var(--gray-500); }
+    .info-val { font-weight: 600; color: var(--gray-300); }
+    @media(max-width:480px){ .confirm-card{ padding: 32px 20px; } }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <div class="nav-logo-badge">🏀</div>
+    <div class="nav-logo-text">EID <span>HOOP</span> FEST</div>
+  </a>
+</nav>
+<div class="confirm-page">
+  <div class="confirm-card">
+    <div style="font-size:4rem;margin-bottom:16px;">🎉</div>
+    <h1 style="font-family:var(--font-display);font-size:2.4rem;margin-bottom:10px;">C'EST <span style="color:#4ade80;">PARTI !</span></h1>
+    <p style="color:var(--gray-400);font-size:0.92rem;line-height:1.7;margin-bottom:4px;">Tu es inscrit au tournoi <strong style="color:#fff;">EID HOOP FEST</strong>. Invite tes coéquipiers avec ton code d'équipe.</p>
+    <div class="info-block">
+      <div class="info-row"><span class="info-key">Tournoi</span><span class="info-val">EID HOOP FEST</span></div>
+      <div class="info-row"><span class="info-key">Format</span><span class="info-val">5 vs 5 · 2×10 min</span></div>
+      <div class="info-row"><span class="info-key">Équipes</span><span class="info-val">12 équipes max</span></div>
+      <div class="info-row"><span class="info-key">Lieu</span><span class="info-val">Sokodé, Togo</span></div>
+    </div>
+    <div style="background:rgba(227,25,55,0.06);border:1px solid rgba(227,25,55,0.15);border-radius:var(--radius-lg);padding:16px;margin-bottom:24px;font-size:0.85rem;color:var(--gray-300);line-height:1.7;">
+      📞 Pour toute question, contacte l'organisation via WhatsApp ou sur place le jour J.
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <a href="/" class="btn btn-primary btn-full btn-lg">Retour à l'accueil</a>
+      <a href="/reglement.html" class="btn btn-ghost btn-full">Lire le règlement</a>
+    </div>
+  </div>
+</div>
+<script>
+  const card = document.querySelector('.confirm-card');
+  card.style.cssText += 'opacity:0;transform:scale(0.94)';
+  setTimeout(() => { card.style.transition = 'opacity 0.5s ease,transform 0.5s ease'; card.style.opacity='1'; card.style.transform='none'; }, 80);
+</script>
+</body>
+</html>

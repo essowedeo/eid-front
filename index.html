@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+  <title>EID HOOP FEST — Tournoi de Basketball Sokodé</title>
+  <meta name="description"
+    content="Le tournoi de basketball urbain de Sokodé. 12 équipes, 5v5, phases de groupes et finale. Inscris ton équipe dès maintenant." />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <style>
+    .hero {
+      height: 100dvh;    /* mobile-friendly: exclut la barre du navigateur */
+      min-height: 100vh; /* fallback pour les vieux navigateurs */
+      max-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--black);
+    }
+
+    .hero-bg .slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out, transform 8s ease-out;
+      transform: scale(1.1);
+    }
+
+    .hero-bg .slide.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .slide-1 {
+      background-image: url('/photos/photo2.jpeg');
+    }
+
+    .slide-2 {
+      background-image: url('/photos/photo4.jpeg');
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(10, 10, 10, 0.7) 0%, rgba(10, 10, 10, 0.4) 50%, rgba(227, 25, 55, 0.1) 100%);
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      background: rgba(227, 25, 55, 0.15);
+      border: 1px solid rgba(227, 25, 55, 0.35);
+      border-radius: 99px;
+      color: #ff4d6d;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 12vw, 8rem);
+      line-height: 0.85; /* Tighter line height for stacked words */
+      letter-spacing: 0.03em;
+      margin-bottom: 8px;
+    }
+
+    .hero-title .red {
+      color: var(--red);
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      color: var(--gray-400);
+      font-weight: 300;
+      margin-bottom: 40px;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 0;
+      justify-content: center;
+      margin-bottom: 44px;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat {
+      padding: 14px 24px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+
+    .hero-stat:last-child {
+      border-right: none;
+    }
+
+    .hero-stat-val {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      color: var(--red);
+      line-height: 1;
+    }
+
+    .hero-stat-lbl {
+      font-size: 0.72rem;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 3px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      padding: 0 8px;
+    }
+
+    /* Responsive hero pour petits téléphones */
+    @media (max-width: 480px) {
+      .hero-title { font-size: clamp(2.8rem, 16vw, 5rem); line-height: 0.85; }
+      .hero-subtitle { font-size: 1.05rem; margin-bottom: 18px; }
+      .hero-actions { flex-direction: column; align-items: center; gap: 8px; }
+      .hero-actions .btn { width: 90%; max-width: 320px; padding: 12px 16px; font-size: 0.9rem; }
+      .hero-eyebrow { font-size: 0.7rem !important; padding: 5px 12px !important; margin-bottom: 12px; }
+      .hero-content { padding: 20px 16px; }
+    }
+
+    @media (max-width: 360px) {
+      .hero-title { font-size: clamp(2.4rem, 18vw, 3.5rem); }
+      .hero-subtitle { font-size: 0.95rem; margin-bottom: 14px; }
+      .hero-actions { gap: 6px; }
+      .hero-actions .btn { width: 95%; padding: 10px 14px; font-size: 0.85rem; }
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--gray-500);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      animation: bounce 2s ease infinite;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateX(-50%) translateY(0)
+      }
+
+      50% {
+        transform: translateX(-50%) translateY(8px)
+      }
+    }
+
+    /* ABOUT */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .about-photo {
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      aspect-ratio: 4/5;
+      position: relative;
+    }
+
+    .about-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .about-photo-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(5, 5, 5, 0.7) 0%, transparent 50%);
+    }
+
+    .about-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .about-text {
+      color: var(--gray-400);
+      line-height: 1.8;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--gray-300);
+      font-size: 0.9rem;
+    }
+
+    .feature-list li::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--red);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    @media(max-width:640px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .about-photo {
+        aspect-ratio: 16/9;
+      }
+    }
+
+    /* PRIZES */
+    .prizes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .prizes-2col {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .prize-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px 20px;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .prize-card:hover {
+      border-color: var(--red);
+      transform: translateY(-4px);
+      box-shadow: 0 0 32px var(--red-glow);
+    }
+
+    .prize-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .prize-place {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--gray-400);
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .prize-amount {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--white);
+    }
+
+    .prize-card.gold {
+      border-color: rgba(251, 191, 36, 0.3);
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.06) 0%, var(--surface) 100%);
+    }
+
+    .prize-card.gold .prize-amount {
+      color: #fbbf24;
+    }
+
+    @media(max-width:640px) {
+      .prizes-grid, .prizes-2col {
+        grid-template-columns: 1fr;
+      }
+      .prize-icon img { width: 80px !important; height: 80px !important; }
+    }
+
+    /* GALLERY */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .gallery-item {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      aspect-ratio: 1;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.06);
+    }
+
+    .gallery-item.tall {
+      grid-row: span 2;
+      aspect-ratio: auto;
+    }
+
+    @media(max-width:640px) {
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* CTA SECTION */
+    .cta-section {
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      padding: 100px 24px;
+    }
+
+    .cta-bg img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .cta-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(5, 5, 5, 0.85), rgba(5, 5, 5, 0.95));
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .cta-sub {
+      color: var(--gray-400);
+      margin-bottom: 40px;
+      font-size: 1rem;
+    }
+
+    /* FORMAT */
+    .format-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .format-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .format-card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+    }
+
+    .format-card-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .format-card-text {
+      color: var(--gray-400);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    @media(max-width:480px) {
+      .format-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-badge">🏀</div>
+      <div class="nav-logo-text">EID <span>HOOP</span> FEST</div>
+    </a>
+    <div class="nav-links">
+      <a href="/equipes.html" class="nav-link">Les Équipes</a>
+      <a href="/reglement.html" class="nav-link">Règlement</a>
+      <a href="/participer.html" class="nav-cta">Participer</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="slide slide-1 active"></div>
+      <div class="slide slide-2"></div>
+    </div>
+    <div class="hero-overlay"></div>
+    
+    <!-- Glow effects -->
+    <div class="glow-bg" style="top: 20%; left: 10%; opacity: 0.5;"></div>
+    <div class="glow-bg" style="bottom: 10%; right: 5%; opacity: 0.3; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);"></div>
+
+    <div class="hero-content">
+      <div id="myTeamBanner" style="display:none; margin-bottom:24px;">
+        <a href="#" id="myTeamLink" class="hero-eyebrow"
+          style="background:rgba(227,25,55,0.1); border:1px solid rgba(227,25,55,0.3); color:var(--white); letter-spacing:0.1em; text-transform:uppercase; font-size:0.75rem;">
+          <span style="color:var(--red); font-weight:900;">●</span> &nbsp; Gérer mon équipe : <span id="myTeamName"
+            style="color:var(--red); font-weight:700;"></span>
+        </a>
+      </div>
+      <div class="hero-eyebrow fade-up"
+        style="background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.1); color:var(--gray-300); text-transform:uppercase; letter-spacing:0.2em; font-size:0.7rem;">
+        Sokodé · Togo · Édition 2026
+      </div>
+      <h1 class="hero-title fade-up fade-up-1">
+        EID<br /><span class="red">HOOP</span><br />FEST
+      </h1>
+      <p class="hero-subtitle fade-up fade-up-2">Le tournoi de basketball de Sokodé</p>
+      <div class="hero-actions fade-up fade-up-3" style="margin-top: 32px;">
+        <a href="/participer.html" class="btn btn-primary btn-xl pulse-red">Rejoindre le tournoi</a>
+        <a href="/concours.html" class="btn btn-outline btn-xl">Concours Dunk & 3 Pts</a>
+        <a href="/equipes.html" class="btn btn-ghost btn-xl">Voir les équipes</a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
+      </svg>
+      scroll
+    </div>
+  </section>
+
+  <!-- FORMAT -->
+  <section class="section" id="format">
+    <div class="container">
+      <div class="tag">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          style="margin-right:8px; vertical-align:middle;">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+        </svg>
+        Format du tournoi
+      </div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(2rem,5vw,3.2rem);margin-bottom:40px;line-height:1;">
+        COMMENT ÇA <span style="color:var(--red);">MARCHE</span></h2>
+      <div class="format-grid">
+        <div class="format-card fade-up">
+          <div class="format-card-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+          </div>
+          <div class="format-card-title">PHASE DE GROUPES</div>
+          <div class="format-card-text">Les équipes s'affrontent en poules. Chaque match compte pour le classement
+            final.</div>
+        </div>
+        <div class="format-card fade-up">
+          <div class="format-card-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+          </div>
+          <div class="format-card-title">MATCHS RAPIDES</div>
+          <div class="format-card-text">4 × 10 minutes de jeu intense. Chaque seconde compte sur le terrain.</div>
+        </div>
+        <div class="format-card fade-up">
+          <div class="format-card-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2">
+              <path
+                d="M12 14.5V20M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM8.5 9.5c.707-1.303 2.5-1.5 3.5-1.5s2.793.197 3.5 1.5M10 14.5c-.707-1.303-2.5-1.5-3.5-1.5S3.707 13.197 3 14.5c.446 2.375 2 5.5 2 5.5h14s1.554-3.125 2-5.5c-.707-1.303-2.5-1.5-3.5-1.5s-2.793.197-3.5 1.5" />
+            </svg>
+          </div>
+          <div class="format-card-title">PHASE FINALE</div>
+          <div class="format-card-text">Les meilleures équipes s'affrontent en élimination directe jusqu'au titre.</div>
+        </div>
+        <div class="format-card fade-up">
+          <div class="format-card-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <path
+                d="M12 2v20M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+          </div>
+          <div class="format-card-title">5 CONTRE 5</div>
+          <div class="format-card-text">Format classique sur terrain. Compose ton effectif pour couvrir tous les postes.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" style="background:var(--dark);">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-photo">
+          <img src="/photos/photo6.jpeg" alt="Ambiance tournoi" />
+          <div class="about-photo-overlay"></div>
+        </div>
+        <div>
+          <div class="tag">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              style="margin-right:8px; vertical-align:middle;">
+              <path d="M17.5 19L22 7l-11 4.5L7 22l10.5-3zM11 11L2 2l9 9z" />
+            </svg>
+            L'événement
+          </div>
+          <h2 class="about-title">PLUS QU'UN<br /><span style="color:var(--red);">TOURNOI</span></h2>
+          <p class="about-text">EID Hoop Fest c'est l'événement basketball de Sokodé. Une compétition qui rassemble les
+            meilleurs joueurs de la région dans une ambiance de feu.</p>
+          <ul class="feature-list">
+            <li>Équipes sélectionnées pour l'excellence</li>
+            <li>Terrain officiel aux normes compétition</li>
+            <li>Ambiance festive et musicale</li>
+            <li>Trophées et récompenses pour les lauréats</li>
+            <li>Photos et vidéos des matchs</li>
+          </ul>
+          <a href="/participer.html" class="btn btn-primary btn-lg" style="margin-top:28px;">Je veux participer</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- CONCOURS -->
+  <section class="section" style="background:var(--surface);">
+    <div class="container" style="text-align:center;">
+      <div class="tag">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          style="margin-right:6px;">
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+        Showtime
+      </div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(2rem,5vw,3.2rem);margin-bottom:40px;line-height:1;">
+        CONCOURS DE <span style="color:var(--red);">DUNK & 3 POINTS</span></h2>
+      <div class="format-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); text-align: left;">
+        <a href="/concours.html?type=Dunk" class="format-card fade-up"
+          style="display:block; text-decoration:none; color:inherit; transition:transform 0.2s; cursor:pointer;"
+          onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='var(--red)'"
+          onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border)'">
+          <div class="format-card-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8zM6 1v3M10 1v3M14 1v3" />
+            </svg>
+          </div>
+          <div class="format-card-title">CONCOURS DE DUNK</div>
+          <div class="format-card-text">Montre ta détente et tes meilleures acrobaties. Enflamme le public de Sokodé !
+          </div>
+        </a>
+        <a href="/concours.html?type=3+Points" class="format-card fade-up"
+          style="display:block; text-decoration:none; color:inherit; transition:transform 0.2s; cursor:pointer;"
+          onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='var(--red)'"
+          onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border)'">
+          <div class="format-card-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+              <path d="M2 12h20" />
+            </svg>
+          </div>
+          <div class="format-card-title">TIRS À 3 POINTS</div>
+          <div class="format-card-text">Adresse et sang-froid. Qui sera le meilleur sniper du tournoi ?</div>
+        </a>
+
+      </div>
+
+      <div class="fade-up"
+        style="margin-top: 40px; display: inline-flex; flex-direction: column; align-items: center; gap: 16px;">
+        <div
+          style="padding: 24px 40px; background: rgba(227,25,55,0.05); border-radius: var(--radius-lg); border: 1px solid rgba(227,25,55,0.2);">
+          <div style="font-family: var(--font-display); font-size: 1.5rem; color: var(--white); margin-bottom: 4px;">
+            INSCRIPTION JEUX & CONCOURS</div>
+          <div style="color: var(--red); font-weight: 700; font-size: 1.2rem; letter-spacing: 0.05em;">1 000 FCFA <span
+              style="font-size: 0.9rem; color: var(--gray-400); font-weight: 400;">/ personne</span></div>
+        </div>
+        <a href="/concours.html" class="btn btn-primary btn-lg pulse-red">S'inscrire aux concours</a>
+      </div>
+
+
+    </div>
+  </section>
+
+  <!-- PRIZES -->
+  <section class="section">
+    <div class="container" style="text-align:center;">
+      <div class="tag">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          style="margin-right:6px;">
+          <path
+            d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-2.34M12 2v12.66" />
+        </svg>
+        Récompenses
+      </div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(2rem,5vw,3.2rem);margin-bottom:40px;line-height:1;">CE
+        QUE TU <span style="color:var(--red);">JOUES</span></h2>
+      <div class="prizes-grid prizes-2col" style="max-width: 640px; margin: 0 auto;">
+        <div class="prize-card gold">
+          <div class="prize-icon" style="display:flex; justify-content:center; align-items:center;">
+            <img src="/photos/trophy_gold.png" alt="Trophée d'Or" style="width:120px; height:120px; object-fit:cover; border-radius:50%; border:3px solid #fbbf24; box-shadow: 0 4px 16px rgba(251,191,36,0.2);" />
+          </div>
+          <div class="prize-place">VAINQUEUR</div>
+          <div class="prize-amount">TROPHÉE + MÉDAILLES</div>
+        </div>
+        <div class="prize-card">
+          <div class="prize-icon" style="display:flex; justify-content:center; align-items:center;">
+            <img src="/photos/medals_silver.png" alt="Médailles d'Argent" style="width:120px; height:120px; object-fit:cover; border-radius:50%; border:3px solid var(--gray-400); box-shadow: 0 4px 16px rgba(255,255,255,0.1);" />
+          </div>
+          <div class="prize-place">2ÈME PLACE</div>
+          <div class="prize-amount">MÉDAILLES SEULES</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="section" style="background:var(--dark);padding-top:60px;padding-bottom:60px;">
+    <div class="container">
+      <div class="tag">📸 Ambiance</div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(2rem,5vw,3rem);margin-bottom:32px;line-height:1;">
+        L'ESPRIT <span style="color:var(--red);">HOOP</span></h2>
+      <div class="gallery-grid">
+        <div class="gallery-item tall"><img src="/photos/photo2.jpeg" alt="Ambiance tournoi" loading="lazy" /></div>
+        <div class="gallery-item"><img src="/photos/photo3.jpeg" alt="Basketball action" loading="lazy" /></div>
+        <div class="gallery-item"><img src="/photos/photo4.jpeg" alt="Joueurs" loading="lazy" /></div>
+        <div class="gallery-item"><img src="/photos/photo5.jpeg" alt="Match" loading="lazy" /></div>
+        <div class="gallery-item"><img src="/photos/photo7.jpeg" alt="Terrain" loading="lazy" /></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-bg photo-bg">
+      <img src="/photos/photo2.jpeg" alt="CTA background" />
+    </div>
+    <div class="cta-overlay"></div>
+    <div class="cta-content">
+      <div class="tag" style="display:inline-flex;margin-bottom:20px;">🏀 Places limitées</div>
+      <h2 class="cta-title">PRÊT À <span style="color:var(--red);">JOUER ?</span></h2>
+      <p class="cta-sub">Inscris ton équipe dès maintenant pour participer à la fête !</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+        <a href="/participer.html" class="btn btn-primary btn-xl">Créer mon équipe</a>
+        <a href="/rejoindre.html" class="btn btn-outline btn-xl">Rejoindre une équipe</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-logo">EID <span>HOOP</span> FEST</div>
+    <p>Sokodé, Togo · 2026</p>
+    <div style="margin-top:16px;display:flex;gap:24px;justify-content:center;">
+      <a href="/reglement.html" style="color:var(--gray-500);">Règlement</a>
+      <a href="/participer.html" style="color:var(--gray-500);">Participer</a>
+    </div>
+  </footer>
+
+  <script type="module">
+    // Slider background
+    let currentSlide = 1;
+    setInterval(() => {
+      document.querySelector('.slide-' + currentSlide).classList.remove('active');
+      currentSlide = currentSlide === 1 ? 2 : 1;
+      document.querySelector('.slide-' + currentSlide).classList.add('active');
+    }, 4000);
+
+    // Check for local team
+    const savedTeam = localStorage.getItem('myTeam');
+    if (savedTeam) {
+      const team = JSON.parse(savedTeam);
+      document.getElementById('myTeamName').textContent = team.name;
+      document.getElementById('myTeamLink').href = `/equipe.html?code=${team.code}`;
+      document.getElementById('myTeamBanner').style.display = 'block';
+    }
+
+
+
+    // Intersection observer for fade-up
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'none'; } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-up').forEach(el => {
+      el.style.opacity = '0';
+      obs.observe(el);
+    });
+  </script>
+</body>
+
+</html>
