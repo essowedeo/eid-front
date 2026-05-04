@@ -216,9 +216,11 @@
   </div>
 
   <script>
+    const API = "https://eid-back.onrender.com/api";
+
     async function loadChallengers() {
       try {
-        const res = await fetch('/api/concours/public');
+        const res = await fetch(`${API}/concours/public`);
         if (!res.ok) return;
         const data = await res.json();
         
@@ -284,7 +286,7 @@
       btn.querySelector('span').textContent = 'Inscription...';
 
       try {
-        const res = await fetch('/api/concours', {
+        const res = await fetch(`${API}/concours`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, phone, type })
@@ -324,7 +326,7 @@
       if (!phone) return;
 
       try {
-        const res = await fetch(`/api/concours/search`, {
+        const res = await fetch(`${API}/concours/search`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone })
