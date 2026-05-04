@@ -289,6 +289,7 @@ function render(team) {
       <div class="bar"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
     </div>
 
+    ${isCaptainOfThisTeam ? `
     <div class="team-code-box">
       <div class="code-label">Code d'invitation</div>
       <div class="code-display">${team.code}</div>
@@ -307,6 +308,7 @@ function render(team) {
         </a>
       </div>
     </div>
+    ` : ''}
 
     <div class="players-section">
       <div class="players-title">JOUEURS (${playerCount}/12)</div>
@@ -315,7 +317,6 @@ function render(team) {
     </div>
 
     <div style="margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;">
-      <a href="/rejoindre.html?code=${team.code}" class="btn btn-outline" style="flex:1;">Inviter un joueur</a>
       <button class="btn btn-ghost" id="refreshBtn" style="flex:1;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg>
         Actualiser
@@ -336,8 +337,11 @@ function render(team) {
   // Animate bar
   setTimeout(() => { document.getElementById('barFill').style.width = pct + '%'; }, 100);
 
-  document.getElementById('copyCode').addEventListener('click', () => copyToClipboard(team.code));
-  document.getElementById('copyLink').addEventListener('click', () => copyToClipboard(inviteLink));
+  if (isCaptainOfThisTeam) {
+    document.getElementById('copyCode')?.addEventListener('click', () => copyToClipboard(team.code));
+    document.getElementById('copyLink')?.addEventListener('click', () => copyToClipboard(inviteLink));
+  }
+
   document.getElementById('refreshBtn').addEventListener('click', load);
 
   // Show Success Modal if needed
