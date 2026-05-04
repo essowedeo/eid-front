@@ -45,3 +45,14 @@ export async function removePlayer(id) {
   if (!r.ok) throw new Error(json.error);
   return json;
 }
+
+export async function authCaptain(code, secretCode) {
+  const r = await fetch(`${API}/teams/${code}/auth`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ secretCode })
+  });
+  const json = await r.json();
+  if (!r.ok) throw new Error(json.error);
+  return json;
+}

@@ -133,7 +133,7 @@
 </div>
 
 <script type="module">
-import { getTeam, confirmPlayer, removePlayer } from '/src/api.js';
+import { getTeam, confirmPlayer, removePlayer, authCaptain } from '/src/api.js';
 
 const params = new URLSearchParams(location.search);
 const code = params.get('code');
@@ -388,14 +388,7 @@ document.getElementById('loginSubmitBtn').addEventListener('click', async () => 
   btn.textContent = "...";
 
   try {
-    const res = await fetch(`/api/teams/${code.toUpperCase()}/auth`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ secretCode: secret })
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
+    const data = await authCaptain(code.toUpperCase(), secret);
 
     // Success! Save to localStorage
     localStorage.setItem('myTeam', JSON.stringify({
