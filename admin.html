@@ -335,7 +335,7 @@
   async function loadAllData() {
     try {
       const [teamsRes, concoursRes] = await Promise.all([
-        fetch(`${window.API}/teams`),
+        fetch(`${window.API}/teams?admin=true`),
         fetch(`${window.API}/concours`)
       ]);
       
