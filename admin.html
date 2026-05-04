@@ -316,6 +316,10 @@
 <!-- Toast -->
 <div id="adminToast" class="toast"></div>
 
+<script type="module">
+  window.API = import.meta.env.VITE_API_URL || '/api';
+</script>
+
 <script>
   let teamsData = [];
   let concoursData = [];
@@ -331,8 +335,8 @@
   async function loadAllData() {
     try {
       const [teamsRes, concoursRes] = await Promise.all([
-        fetch('/api/teams'),
-        fetch('/api/concours')
+        fetch(`${window.API}/teams`),
+        fetch(`${window.API}/concours`)
       ]);
       
       teamsData = await teamsRes.json();
@@ -431,7 +435,7 @@
 
   async function viewPlayers(code) {
     try {
-      const res = await fetch(`/api/teams/${code}`);
+      const res = await fetch(`${window.API}/teams/${code}`);
       const data = await res.json();
       
       document.getElementById('modalTeamName').textContent = data.name;
@@ -500,7 +504,7 @@
       `Es-tu sûr de vouloir supprimer définitivement l'équipe "${name}" ?`,
       async () => {
         try {
-          const res = await fetch(`/api/teams/${code}`, { method: 'DELETE' });
+          const res = await fetch(`${window.API}/teams/${code}`, { method: 'DELETE' });
           if(res.ok) {
             showToast(`Équipe "${name}" supprimée`);
             loadAllData();
@@ -517,7 +521,7 @@
       `Es-tu sûr de vouloir retirer "${name}" du concours ?`,
       async () => {
         try {
-          const res = await fetch(`/api/concours/${id}`, { method: 'DELETE' });
+          const res = await fetch(`${window.API}/concours/${id}`, { method: 'DELETE' });
           if(res.ok) {
             showToast(`${name} retiré du concours`);
             loadAllData();
@@ -537,7 +541,7 @@
       `Voulez-vous vraiment ${action} pour l'équipe "${name}" ?`,
       async () => {
         try {
-          const res = await fetch(`/api/teams/${code}/pay`, { method: 'PUT' });
+          const res = await fetch(`${window.API}/teams/${code}/pay`, { method: 'PUT' });
           if(res.ok) {
             const data = await res.json();
             showToast(data.paid ? "Paiement validé ! ✅" : "Paiement annulé ↩️");
@@ -560,7 +564,7 @@
       `Voulez-vous vraiment ${action} pour "${name}" ?`,
       async () => {
         try {
-          const res = await fetch(`/api/concours/${id}/pay`, { method: 'PUT' });
+          const res = await fetch(`${window.API}/concours/${id}/pay`, { method: 'PUT' });
           if(res.ok) {
             const data = await res.json();
             showToast(data.paid ? "Paiement validé ! ✅" : "Paiement annulé ↩️");
