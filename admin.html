@@ -316,11 +316,8 @@
 <!-- Toast -->
 <div id="adminToast" class="toast"></div>
 
-<script type="module">
-  window.API = import.meta.env.VITE_API_URL || '/api';
-</script>
-
 <script>
+  window.API = "https://eid-back.onrender.com/api";
   let teamsData = [];
   let concoursData = [];
 
@@ -508,6 +505,9 @@
           if(res.ok) {
             showToast(`Équipe "${name}" supprimée`);
             loadAllData();
+          } else {
+            const data = await res.json();
+            showToast(data.error || "Erreur lors de la suppression", 'error');
           }
         } catch(e) { showToast("Erreur réseau", 'error'); }
       },
