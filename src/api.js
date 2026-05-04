@@ -1,4 +1,4 @@
-const API = '/api';
+const API = import.meta.env.VITE_API_URL || '/api';
 
 export async function createTeam(data) {
   const r = await fetch(`${API}/teams`, {
